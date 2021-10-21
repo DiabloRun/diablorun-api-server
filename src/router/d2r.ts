@@ -25,8 +25,10 @@ router.post("/d2r/item", async function (req, res) {
     user.id,
     req.body.container,
     req.body.slot,
-    Buffer.from(req.body.item_jpg, "base64"),
-    Buffer.from(req.body.description_jpg, "base64")
+    req.body.item_jpg ? Buffer.from(req.body.item_jpg, "base64") : undefined,
+    req.body.description_jpg
+      ? Buffer.from(req.body.description_jpg, "base64")
+      : undefined
   );
 
   res.send("OK");
