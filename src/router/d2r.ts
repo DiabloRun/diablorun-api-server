@@ -43,6 +43,8 @@ router.post("/d2r/remove-items", async function (req, res) {
   for (const [container, slot] of req.body) {
     await removeD2rItem(user.id, container, slot);
   }
+
+  res.send("OK");
 });
 
 async function sendJpg(
