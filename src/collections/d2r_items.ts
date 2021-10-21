@@ -29,21 +29,18 @@ export async function updateD2rItem(
 
   if (itemJpg && descriptionJpg) {
     await db.query(
-      `UPDATE d2r_items SET update_time=$4, item_jpg=$5, description_jpg=$6
-      WHERE user_id=$1 AND container=$2 AND slot=$3 WHERE id=$7`,
-      [userId, container, slot, time, itemJpg, descriptionJpg, id]
+      `UPDATE d2r_items SET update_time=$2, item_jpg=$3, description_jpg=$4 WHERE id=$1`,
+      [id, time, itemJpg, descriptionJpg]
     );
   } else if (itemJpg) {
     await db.query(
-      `UPDATE d2r_items SET update_time=$4, item_jpg=$5
-      WHERE user_id=$1 AND container=$2 AND slot=$3 WHERE id=$6`,
-      [userId, container, slot, time, itemJpg, id]
+      `UPDATE d2r_items SET update_time=$2, item_jpg=$3 WHERE id=$1`,
+      [id, time, itemJpg]
     );
   } else if (descriptionJpg) {
     await db.query(
-      `UPDATE d2r_items SET update_time=$4, description_jpg=$5
-      WHERE user_id=$1 AND container=$2 AND slot=$3 WHERE id=$6`,
-      [userId, container, slot, time, descriptionJpg, id]
+      `UPDATE d2r_items SET update_time=$2, description_jpg=$3 WHERE id=$1`,
+      [id, time, descriptionJpg]
     );
   }
 }
