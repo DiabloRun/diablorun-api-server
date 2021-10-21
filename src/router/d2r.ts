@@ -3,6 +3,7 @@ import { D2rItem } from "src/types";
 import {
   getD2rItemDescriptionJpg,
   getD2rItemJpg,
+  removeD2rItem,
   updateD2rItem,
 } from "../collections/d2r_items";
 import {
@@ -29,6 +30,19 @@ router.post("/d2r/item", async function (req, res) {
   );
 
   res.send("OK");
+});
+
+router.post("/d2r/remove-items", async function (req, res) {
+  const user = await getUserByAuthorizationHeader(req.header("authorization"));
+
+  if (!user) {
+    res.sendStatus(401);
+    return;
+  }
+
+  for (const [container, slot] of req.body) {
+    await removeD2rItem(user.id, container, slot);
+  }
 });
 
 async function sendJpg(

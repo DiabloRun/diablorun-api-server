@@ -17,6 +17,17 @@ export async function updateD2rItem(
   );
 }
 
+export async function removeD2rItem(
+  userId: number,
+  container: D2rItem["container"],
+  slot: D2rItem["slot"]
+) {
+  await db.query(
+    `DELETE FROM d2r_items WHERE user_id=$1 AND container=$2 AND slot=$3`,
+    [userId, container, slot]
+  );
+}
+
 export async function getD2rItemJpg(
   userId: number,
   container: D2rItem["container"],
