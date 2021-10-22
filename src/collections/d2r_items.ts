@@ -5,10 +5,21 @@ export async function updateD2rItem(
   userId: number,
   container: D2rItem["container"],
   slot: D2rItem["slot"],
-  itemJpg?: Buffer,
-  descriptionJpg?: Buffer
+  itemJpg: Buffer | null,
+  descriptionJpg: Buffer | null
 ) {
   const time = Math.floor(Date.now() / 1000);
+
+  await db.query(
+    `INSERT INTO d2r_items (
+      user_id, session_id, container, slot, update_time, item_jpg, description_jpg
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+    ON CONFLICT (user_id, session_id, container, slot)
+    DO UPDATE SET update_time=$5, item_jpg=COALESCE($6, d2r_items.item_jpg), description_jpg=COALESCE($7, d2r_items.description_jpg)`,
+    [userId, 1, container, slot, time, itemJpg, descriptionJpg]
+  );
+
+  /*
   const {
     rows,
   } = await db.query(
@@ -43,6 +54,7 @@ export async function updateD2rItem(
       [id, time, descriptionJpg]
     );
   }
+  */
 }
 
 export async function removeD2rItem(
