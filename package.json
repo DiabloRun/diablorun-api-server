@@ -2,7 +2,7 @@
   "name": "@diablorun/diablorun-api-server",
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "start": "node lib/index.js",
     "dev": "nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec ts-node --log-error src/index.ts",
