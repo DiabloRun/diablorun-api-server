@@ -165,6 +165,8 @@ export interface CharacterSnapshot {
 export interface Race {
   id: number;
   name: string;
+  start_time: number;
+  finish_time: number;
 }
 
 export interface RaceRule {
