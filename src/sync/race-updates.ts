@@ -28,8 +28,8 @@ export async function getRaceByArgs(d2_args: string): Promise<Race | null> {
   }
 
   const raceQuery = await db.query(
-    `SELECT id, start_time, finish_time FROM races WHERE id=$1 OR token=$1`,
-    [raceTokenMatch[1]]
+    `SELECT id, start_time, finish_time FROM races WHERE id=$1 OR token=$2`,
+    [parseInt(raceTokenMatch[1]) || 0, raceTokenMatch[1]]
   );
 
   return raceQuery.rows.length ? raceQuery.rows[0] : null;
