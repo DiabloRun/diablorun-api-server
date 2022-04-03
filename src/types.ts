@@ -188,6 +188,8 @@ export interface RaceRule {
   stat: keyof Character;
   difficulty: Character["difficulty"];
   quest_id: number;
+  monster_id: number;
+  time: string;
   time_type: "race" | "state";
   time_seconds: number;
   claimed: boolean;
