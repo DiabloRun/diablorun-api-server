@@ -332,7 +332,7 @@ router.post("/races", async function (req, res) {
 
   if (race.end) {
     await db.query(
-      `UPDATE race_characters SET finish_time=$1 WHERE race_id=$2`,
+      `UPDATE race_characters SET finish_time=$1 WHERE race_id=$2 AND finish_time IS NULL`,
       [race.finish_time, race.id]
     );
 
