@@ -70,6 +70,10 @@ export async function sync(payload: Payload) {
     };
   }
 
+  if (user.id === 1 || user.id === 2) {
+    console.log(user.id, payload.KilledMonsters);
+  }
+
   // Get active race by args
   const race = await getRaceByArgs(
     payload.D2ProcessInfo.CommandLineArgs.join(" ")
@@ -208,15 +212,6 @@ export async function sync(payload: Payload) {
   );
 
   await saveRaceUpdates(characterId, raceUpdates);
-
-  // Test
-  if (user.id < 3) {
-    for (const kill of payload.KilledMonsters ?? []) {
-      if (kill.TypeFlags & 0x00000008) {
-        console.log("[UNIQUE]", user, kill);
-      }
-    }
-  }
 
   // Broadcast updates
   await broadcast(`user/${user.name.toLowerCase()}`, {
