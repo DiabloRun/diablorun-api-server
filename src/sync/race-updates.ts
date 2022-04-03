@@ -64,7 +64,12 @@ export async function getRaceUpdates(
   const updatedStats = Object.keys(characterUpdates);
 
   if (updatedStats.length) {
-    findRules.push(sqlFormat(`(type='per' AND stat IN (%L))`, updatedStats));
+    findRules.push(
+      sqlFormat(
+        `(type IN ('per', 'for', 'stat') AND stat IN (%L))`,
+        updatedStats
+      )
+    );
   }
 
   if (questUpdates.length) {
@@ -94,26 +99,58 @@ export async function getRaceUpdates(
     );
 
     for (const rule of rules) {
-      if (rule.type === "quest") {
-        checkpointUpdates.push({
-          race_id: rule.race_id,
-          character_id: characterId,
-          rule_id: rule.id,
-          update_time: time,
-          points: rule.amount,
-        });
-      } else if (rule.type === "per") {
-        checkpointUpdates.push({
-          race_id: rule.race_id,
-          character_id: characterId,
-          rule_id: rule.id,
-          update_time: time,
-          points: rule.amount * (characterUpdates[rule.stat] as number),
-        });
-      }
+      if (rule.context === "points") {
+        if (rule.type === "quest") {
+          checkpointUpdates.push({
+            race_id: rule.race_id,
+            character_id: characterId,
+            rule_id: rule.id,
+            update_time: time,
+            points: rule.amount,
+          });
+        } else if (rule.type === "per") {
+          checkpointUpdates.push({
+            race_id: rule.race_id,
+            character_id: characterId,
+            rule_id: rule.id,
+            update_time: time,
+            points: rule.amount * (characterUpdates[rule.stat] as number),
+          });
+        } else if (rule.type === "for") {
+          checkpointUpdates.push({
+            race_id: rule.race_id,
+            character_id: characterId,
+            rule_id: rule.id,
+            update_time: time,
+            points:
+              (characterUpdates[rule.stat] ?? 0) >= rule.counter
+                ? rule.amount
+                : 0,
+          });
+        }
+      } else if (rule.context === "finish_conditions") {
+        let finish = false;
 
-      if (rule.context === "finish_conditions") {
-        raceFinishedUpdates.push(rule.race_id);
+        switch (rule.type) {
+          case "quest":
+            finish = true;
+            break;
+          case "stat":
+            finish = (characterUpdates[rule.stat] ?? 0) >= rule.counter;
+            break;
+        }
+
+        if (finish) {
+          checkpointUpdates.push({
+            race_id: rule.race_id,
+            character_id: characterId,
+            rule_id: rule.id,
+            update_time: time,
+            points: rule.amount,
+          });
+
+          raceFinishedUpdates.push(rule.race_id);
+        }
       }
     }
   }

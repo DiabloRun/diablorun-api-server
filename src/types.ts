@@ -175,7 +175,7 @@ export interface RaceRule {
   race_id: number;
   context: "points" | "finish_conditions";
   amount: number;
-  type: "quest" | "per" | "for";
+  type: "quest" | "per" | "for" | "stat";
   counter: number;
   stat: keyof Character;
   difficulty: Character["difficulty"];
