@@ -28,7 +28,7 @@ export async function getRaceByArgs(d2_args: string): Promise<Race | null> {
   }
 
   const raceQuery = await db.query(
-    `SELECT id, start_time, finish_time FROM races WHERE token=$1`,
+    `SELECT id, start_time, finish_time FROM races WHERE id=$1 OR token=$1`,
     [raceTokenMatch[1]]
   );
 
