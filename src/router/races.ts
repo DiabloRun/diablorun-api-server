@@ -337,6 +337,7 @@ router.post("/races", async function (req, res) {
       );
     }
 
+    /*
     await db.query(
       `
             UPDATE characters
@@ -345,6 +346,7 @@ router.post("/races", async function (req, res) {
         `,
       [race.start_time, race.preliminary_character_finish_time, race.id]
     );
+    */
   }
 
   // Websocket push
@@ -353,12 +355,7 @@ router.post("/races", async function (req, res) {
 
   if (race.start_in) {
     const participants = await db.query(
-      `
-            SELECT name FROM users
-            WHERE id IN (
-                SELECT DISTINCT(user_id) FROM characters WHERE race_id=$1
-            )
-        `,
+      `SELECT name FROM users WHERE race_id=$1`,
       [race.id]
     );
 
