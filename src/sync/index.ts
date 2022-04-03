@@ -14,6 +14,10 @@ import {
   joinRace,
   saveRaceUpdates,
 } from "./race-updates";
+import {
+  getSuperUniqueUpdates,
+  saveSuperUniqueUpdates,
+} from "./super-unique-updates";
 
 const [MIN_MAJOR, MIN_MINOR, MIN_PATCH] = (
   process.env.MIN_DI_VERSION || "0.0.0"
@@ -134,6 +138,7 @@ export async function sync(payload: Payload) {
   }
 
   // Get updates
+  const superUniqueUpdates = getSuperUniqueUpdates(time, payload, before);
   const questUpdates = getQuestUpdates(time, payload, before);
   const characterUpdates = getCharacterUpdates(
     time,
@@ -173,6 +178,7 @@ export async function sync(payload: Payload) {
     characterId = result.rows[0].id;
   }
 
+  await saveSuperUniqueUpdates(characterId, superUniqueUpdates);
   await saveQuestUpdates(characterId, questUpdates);
   await saveItemUpdates(characterId, itemUpdates);
 
