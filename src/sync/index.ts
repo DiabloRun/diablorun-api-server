@@ -98,7 +98,11 @@ export async function sync(payload: Payload) {
     );
 
     if (characterBefore) {
-      const [itemsBefore, questsBefore] = await Promise.all([
+      const [
+        itemsBefore,
+        questsBefore,
+        superUniquesBefore,
+      ] = await Promise.all([
         await db.query(
           `SELECT item_id, item_hash, container, slot, x, y FROM character_items WHERE character_id=$1`,
           [characterBefore.id]
@@ -107,12 +111,17 @@ export async function sync(payload: Payload) {
           `SELECT difficulty, quest_id FROM quests WHERE character_id=$1`,
           [characterBefore.id]
         ),
+        await db.query(
+          `SELECT difficulty, monster_id FROM super_uniques WHERE character_id=$1`,
+          [characterBefore.id]
+        ),
       ]);
 
       before = {
         character: characterBefore,
         items: itemsBefore.rows,
         quests: questsBefore.rows,
+        superUniques: superUniquesBefore.rows,
       };
     }
   }

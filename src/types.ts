@@ -113,12 +113,10 @@ export interface CharacterQuest {
   update_time: number;
 }
 
-export interface CharacterMonsterKill {
+export interface CharacterSuperUnique {
   character_id: number;
   difficulty: Character["difficulty"];
-  class_id: number;
-  type: "animal" | "demon" | "undead";
-  flags: number;
+  monster_id: number;
   update_time: number;
 }
 
@@ -170,6 +168,7 @@ export interface CharacterSnapshot {
   quests: CharacterQuest[];
   items: CharacterItem[];
   races?: Race[];
+  superUniques: CharacterSuperUnique[];
 }
 
 export interface Race {
