@@ -58,13 +58,7 @@ router.get("/races/:id", async function (req, res) {
   const id = req.params.id;
   const time = Math.floor(Date.now() / 1000);
 
-  const [
-    race,
-    lobby,
-    rules,
-    finishedCharacters,
-    unfinishedCharacters,
-  ] = await Promise.all([
+  const [race, lobby, rules, characters] = await Promise.all([
     // Fetch race
     db.query(
       `
@@ -97,43 +91,14 @@ router.get("/races/:id", async function (req, res) {
         `,
       [id]
     ),
-    // Fetch finished characters
-    db.query(
-      `
-            WITH latest_characters AS (
-                SELECT DISTINCT ON (characters.user_id) 
-                characters.*, race_characters.*, race_characters.finish_time - race_characters.start_time AS time FROM race_characters
-                INNER JOIN characters ON characters.id = race_characters.character_id
-                WHERE race_characters.race_id=$1 AND race_characters.finish_time IS NOT NULL
-                ORDER BY characters.user_id, time ASC
-            ), rankings AS (
-                SELECT latest_characters.*,
-                (RANK() OVER (
-                    ORDER BY time ASC
-                ))::integer AS rank
-                FROM latest_characters
-            )
-            SELECT
-                rankings.*,
-                users.name AS user_name,
-                users.country_code AS user_country_code,
-                users.dark_color_from AS user_color
-            FROM rankings
-            INNER JOIN users ON rankings.user_id = users.id
-            ORDER BY rank LIMIT 30
-        `,
-      [id]
-    ),
-    // Fetch unfinished characters
+    // Fetch characters
     db.query(
       `
             WITH latest_characters AS (
                 SELECT DISTINCT ON (characters.user_id) 
                 characters.*, race_characters.*, ${time} - race_characters.start_time AS time FROM race_characters
                 INNER JOIN characters ON characters.id = race_characters.character_id
-                WHERE race_characters.race_id=$1 AND race_characters.finish_time IS NULL AND characters.update_time > ${
-                  time - 60000
-                }
+                WHERE race_characters.race_id=$1
                 ORDER BY characters.user_id, characters.update_time DESC
             ), rankings AS (
                 SELECT latest_characters.*,
@@ -164,8 +129,7 @@ router.get("/races/:id", async function (req, res) {
     time: new Date().getTime(),
     race: race.rows[0],
     rules: rules.rows,
-    finishedCharacters: finishedCharacters.rows,
-    unfinishedCharacters: unfinishedCharacters.rows,
+    characters: characters.rows,
     lobby: lobby.rows,
     // notifications: notifications.rows,
     // pointsLog: race.rows[0].start_time ? pointsLog.rows : []
@@ -178,6 +142,26 @@ router.post("/races", async function (req, res) {
 
   if (race.start_in) {
     race.start_time = Math.floor(Date.now() / 1000) + race.start_in;
+
+    /*
+    race.finish_time = null;
+
+    const conditions = await db.query(
+      `
+            SELECT time_type, time_seconds FROM race_rules
+            WHERE race_id=$1 AND context='finish_conditions' AND type='time'
+        `,
+      [race.id]
+    );
+
+    if (conditions.rows.length) {
+      race.preliminary_character_finish_time = Math.min(
+        ...conditions.rows.map(
+          ({ time_seconds }) => race.start_time + time_seconds
+        )
+      );
+    }
+    */
   }
 
   if (race.end) {
@@ -320,37 +304,6 @@ router.post("/races", async function (req, res) {
         ]
       );
     }
-  }
-
-  // Start race
-  if (race.start_time) {
-    race.preliminary_character_finish_time = null;
-    const conditions = await db.query(
-      `
-            SELECT time_type, time_seconds FROM race_rules
-            WHERE race_id=$1 AND context='finish_conditions' AND type='time'
-        `,
-      [race.id]
-    );
-
-    if (conditions.rows.length) {
-      race.preliminary_character_finish_time = Math.min(
-        ...conditions.rows.map(
-          ({ time_seconds }) => race.start_time + time_seconds
-        )
-      );
-    }
-
-    /*
-    await db.query(
-      `
-            UPDATE characters
-            SET preliminary=false, start_time=$1, finish_time=$2
-            WHERE race_id=$3 AND preliminary=true
-        `,
-      [race.start_time, race.preliminary_character_finish_time, race.id]
-    );
-    */
   }
 
   // Alert race start or end
