@@ -5,6 +5,7 @@ export interface User {
   country_code: string;
   color: string;
   profile_image_url: string;
+  race_id: number | null;
 }
 
 export interface Character {

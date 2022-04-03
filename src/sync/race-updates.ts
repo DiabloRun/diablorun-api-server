@@ -20,29 +20,26 @@ interface RaceUpdate {
   addCheckpoints: RaceCharacterCheckpoint[];
 }
 
-export async function joinRaceByArgs(
-  time: number,
-  characterId: number,
-  d2_args: string
-) {
+export async function getRaceByArgs(d2_args: string): Promise<Race | null> {
   const raceTokenMatch = d2_args.match(/-race([\w-]+)/);
 
-  if (raceTokenMatch) {
-    const token = raceTokenMatch[1];
-    const raceQuery = await db.query(
-      `SELECT id, finish_time FROM races WHERE token=$1 AND (finish_time IS NULL OR finish_time<$2)`,
-      [token, time]
-    );
-
-    if (raceQuery.rows.length) {
-      const race = raceQuery.rows[0] as Race;
-
-      await db.query(
-        "INSERT INTO race_characters (race_id, character_id, start_time, update_time, finish_time) VALUES ($1, $2, $3, $3, $4)",
-        [race.id, characterId, time, race.finish_time]
-      );
-    }
+  if (!raceTokenMatch) {
+    return null;
   }
+
+  const raceQuery = await db.query(
+    `SELECT id, finish_time FROM races WHERE token=$1`,
+    [raceTokenMatch[1]]
+  );
+
+  return raceQuery.rows.length ? raceQuery.rows[0] : null;
+}
+
+export async function joinRace(time: number, characterId: number, race: Race) {
+  await db.query(
+    "INSERT INTO race_characters (race_id, character_id, start_time, update_time, finish_time) VALUES ($1, $2, $3, $3, $4)",
+    [race.id, characterId, time, race.finish_time]
+  );
 }
 
 export async function getRaceUpdates(

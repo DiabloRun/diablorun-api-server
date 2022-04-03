@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import * as bodyParser from "body-parser";
 import { D2rItem } from "src/types";
 import {
   getD2rItemDescriptionJpg,
@@ -11,7 +12,35 @@ import {
   getUserByName,
 } from "../collections/users";
 
+import { exec } from "child_process";
+import { writeFile } from "fs";
+
 export const router = Router();
+
+router.post("/d2r/image", bodyParser.raw(), async function (req, res) {
+  const user = await getUserByAuthorizationHeader(req.header("authorization"));
+
+  if (!user) {
+    res.sendStatus(401);
+    return;
+  }
+
+  writeFile("test.jpg", req.body, () => {
+
+    exec(
+      `tesseract --psm 11 -l D2R test.jpg test tsv`,
+      (err, stdout, stderr) => {
+        if (err) {
+          console.log(err);
+        }
+
+        console.log("hello!");
+        console.log(req.body);
+        res.sendStatus(200);
+      }
+    )
+  });
+});
 
 router.post("/d2r/item", async function (req, res) {
   const user = await getUserByAuthorizationHeader(req.header("authorization"));

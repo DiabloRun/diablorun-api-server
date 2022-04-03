@@ -16,14 +16,14 @@ export interface ItemPayload {
 }
 
 export interface Payload {
-  Event?: "ProcessFound" | "DataRead";
+  Event: "ProcessFound" | "DataRead";
   Headers: string;
 
   DIApplicationInfo: {
     Version: string;
   };
 
-  D2ProcessInfo?: {
+  D2ProcessInfo: {
     Type: string;
     Version: string;
     CommandLineArgs: string[];

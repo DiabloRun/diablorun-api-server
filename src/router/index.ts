@@ -16,8 +16,9 @@ import * as d2r from "./d2r";
 
 const router = Router();
 
-router.use(bodyParser.json());
 router.use(d2r.router);
+
+router.use(bodyParser.json());
 router.use(sync.router);
 router.use(users.router);
 router.use(characters.router);

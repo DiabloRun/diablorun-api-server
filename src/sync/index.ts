@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import { getUserByApiKey } from "../collections/users";
+import { getUserByApiKey, setUserRace } from "../collections/users";
 import { Character, CharacterSnapshot } from "../types";
 import db from "../services/db";
 import { getItemUpdates, saveItemUpdates } from "./item-updates";
@@ -9,8 +9,9 @@ import { getQuestUpdates, saveQuestUpdates } from "./quest-updates";
 import { broadcast } from "../services/ws";
 import { getCurrentLadder } from "../collections/ladders";
 import {
+  getRaceByArgs,
   getRaceUpdates,
-  joinRaceByArgs,
+  joinRace,
   saveRaceUpdates,
 } from "./race-updates";
 
@@ -40,10 +41,6 @@ async function getLatestCharacterByName(
 }
 
 export async function sync(payload: Payload) {
-  if (payload.Event === "ProcessFound") {
-    return;
-  }
-
   // Sync time
   const time = Math.floor(new Date().getTime() / 1000);
 
@@ -58,7 +55,7 @@ export async function sync(payload: Payload) {
   ) {
     throw {
       status: 400,
-      message: `DiabloRun supports DiabloInterface 0.6.9 or later, you are currently running ${version}. Download the latest release from https://github.com/DiabloRun/DiabloInterface/releases`,
+      message: `DiabloRun supports DiabloInterface ${MIN_MAJOR}.${MIN_MINOR}.${MIN_PATCH} or later, you are currently running ${version}. Download the latest release from https://github.com/DiabloRun/DiabloInterface/releases`,
     };
   }
 
@@ -71,6 +68,20 @@ export async function sync(payload: Payload) {
       status: 400,
       message: `Invalid or missing API_KEY. Visit https://diablo.run/setup`,
     };
+  }
+
+  // Get active race by args
+  const race = await getRaceByArgs(
+    payload.D2ProcessInfo.CommandLineArgs.join(" ")
+  );
+
+  if (user.race_id !== (race?.id ?? null)) {
+    await setUserRace(user, race);
+  }
+
+  // Stop if no character data is provided
+  if (payload.Event === "ProcessFound") {
+    return;
   }
 
   // Get character snapshot before update
@@ -177,8 +188,8 @@ export async function sync(payload: Payload) {
     */
 
   // Check command line args to join race
-  if (!before && characterUpdates.d2_args) {
-    await joinRaceByArgs(time, characterId, characterUpdates.d2_args);
+  if (!before && race && (!race.finish_time || time < race.finish_time)) {
+    await joinRace(time, characterId, race);
   }
 
   // Check race updates

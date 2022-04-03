@@ -60,6 +60,7 @@ router.get("/races/:id", async function (req, res) {
 
   const [
     race,
+    lobby,
     rules,
     finishedCharacters,
     unfinishedCharacters,
@@ -80,6 +81,13 @@ router.get("/races/:id", async function (req, res) {
                 active, token
             FROM races WHERE id=$1
         `,
+      [id]
+    ),
+    // Fetch users in lobby
+    db.query(
+      `SELECT
+        id, name, country_code, dark_color_from AS color, profile_image_url, race_id
+      FROM users WHERE race_id=$1`,
       [id]
     ),
     // Fetch rules
@@ -158,6 +166,7 @@ router.get("/races/:id", async function (req, res) {
     rules: rules.rows,
     finishedCharacters: finishedCharacters.rows,
     unfinishedCharacters: unfinishedCharacters.rows,
+    lobby: lobby.rows,
     // notifications: notifications.rows,
     // pointsLog: race.rows[0].start_time ? pointsLog.rows : []
   });
