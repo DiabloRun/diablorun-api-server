@@ -177,7 +177,11 @@ router.post("/races", async function (req, res) {
   const race = req.body;
 
   if (race.start_in) {
-    race.start_time = Math.floor(new Date().getTime() / 1000) + race.start_in;
+    race.start_time = Math.floor(Date.now() / 1000) + race.start_in;
+  }
+
+  if (race.end) {
+    race.finish_time = Math.floor(Date.now() / 1000);
   }
 
   // Update race configuration
@@ -349,7 +353,7 @@ router.post("/races", async function (req, res) {
     */
   }
 
-  // Websocket push
+  // Alert race start or end
   const room = `race/${race.id}`;
   const twitchMessages = [];
 
@@ -373,6 +377,26 @@ router.post("/races", async function (req, res) {
     }
   }
 
+  if (race.end) {
+    await db.query(
+      `UPDATE race_characters SET finish_time=$1 WHERE race_id=$2`,
+      [race.finish_time, race.id]
+    );
+
+    const participants = await db.query(
+      `SELECT name FROM users WHERE race_id=$1`,
+      [race.id]
+    );
+
+    for (const { name } of participants.rows) {
+      twitchMessages.push({
+        channel: `#${name}`,
+        message: `diablo.run/race/${race.id} has ended!`,
+      });
+    }
+  }
+
+  // Broadcast changes to race subscribers
   await broadcast(room, {
     room,
     action: "race",
