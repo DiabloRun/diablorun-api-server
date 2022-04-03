@@ -12,6 +12,7 @@ import {
   findRaceCharacters,
   findRaceRules,
 } from "../collections/races";
+import { Payload } from "./payload";
 
 interface RaceUpdate {
   raceId: number;
@@ -46,7 +47,8 @@ export async function getRaceUpdates(
   time: number,
   characterId: number,
   characterUpdates: Partial<Character>,
-  questUpdates: Partial<CharacterQuest>[]
+  questUpdates: Partial<CharacterQuest>[],
+  payload: Payload
 ): Promise<RaceUpdate[]> {
   const raceCharacters = await findRaceCharacters(
     sqlFormat(

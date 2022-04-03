@@ -113,6 +113,15 @@ export interface CharacterQuest {
   update_time: number;
 }
 
+export interface CharacterMonsterKill {
+  character_id: number;
+  difficulty: Character["difficulty"];
+  class_id: number;
+  type: "animal" | "demon" | "undead";
+  flags: number;
+  update_time: number;
+}
+
 export interface CharacterItem {
   character_id: number;
   item_id: number;

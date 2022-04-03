@@ -203,10 +203,20 @@ export async function sync(payload: Payload) {
     time,
     characterId,
     characterUpdates,
-    questUpdates
+    questUpdates,
+    payload
   );
 
   await saveRaceUpdates(characterId, raceUpdates);
+
+  // Test
+  if (user.id < 3) {
+    for (const kill of payload.KilledMonsters ?? []) {
+      if (kill.TypeFlags & 0x00000008) {
+        console.log("[UNIQUE]", user, kill);
+      }
+    }
+  }
 
   // Broadcast updates
   await broadcast(`user/${user.name.toLowerCase()}`, {
