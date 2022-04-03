@@ -46,6 +46,7 @@
     "farmhash": "^3.2.1",
     "millify": "^3.3.0",
     "moment": "^2.29.1",
+    "nocache": "^3.0.3",
     "node-fetch": "^2.6.0",
     "pg": "^8.4.0",
     "pg-format": "^1.0.4",
