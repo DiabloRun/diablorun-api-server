@@ -74,10 +74,6 @@ export async function sync(payload: Payload) {
     };
   }
 
-  if (user.id === 1 || user.id === 2) {
-    console.log(user.id, payload.KilledMonsters);
-  }
-
   // Get active race by args
   const race = await getRaceByArgs(
     payload.D2ProcessInfo.CommandLineArgs.join(" ")
@@ -223,7 +219,7 @@ export async function sync(payload: Payload) {
     characterId,
     characterUpdates,
     questUpdates,
-    payload
+    superUniqueUpdates
   );
 
   await saveRaceUpdates(characterId, raceUpdates);
@@ -236,6 +232,7 @@ export async function sync(payload: Payload) {
     characterUpdates,
     itemUpdates,
     questUpdates,
+    superUniqueUpdates,
     raceUpdates: [],
   });
 

@@ -1,6 +1,7 @@
 import {
   Character,
   CharacterQuest,
+  CharacterSuperUnique,
   Race,
   RaceCharacter,
   RaceCharacterCheckpoint,
@@ -48,7 +49,7 @@ export async function getRaceUpdates(
   characterId: number,
   characterUpdates: Partial<Character>,
   questUpdates: Partial<CharacterQuest>[],
-  payload: Payload
+  superUniqueUpdates: Partial<CharacterSuperUnique>[]
 ): Promise<RaceUpdate[]> {
   const raceCharacters = await findRaceCharacters(
     sqlFormat(
@@ -86,6 +87,18 @@ export async function getRaceUpdates(
     }
   }
 
+  if (superUniqueUpdates) {
+    for (const superUnique of superUniqueUpdates) {
+      findRules.push(
+        sqlFormat(
+          `(type='super_unique' AND difficulty=%L AND monster_id=%L)`,
+          superUnique.difficulty,
+          superUnique.monster_id
+        )
+      );
+    }
+  }
+
   // Get checkpoint updates
   const checkpointUpdates: RaceCharacterCheckpoint[] = [];
   const raceFinishedUpdates = [];
@@ -102,7 +115,7 @@ export async function getRaceUpdates(
 
     for (const rule of rules) {
       if (rule.context === "points") {
-        if (rule.type === "quest") {
+        if (rule.type === "quest" || rule.type === "super_unique") {
           checkpointUpdates.push({
             race_id: rule.race_id,
             character_id: characterId,
@@ -135,6 +148,7 @@ export async function getRaceUpdates(
 
         switch (rule.type) {
           case "quest":
+          case "super_unique":
             finish = true;
             break;
           case "stat":

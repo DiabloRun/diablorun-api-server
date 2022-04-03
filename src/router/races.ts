@@ -274,7 +274,7 @@ router.post("/races", async function (req, res) {
                 INSERT INTO race_rules (
                     race_id, context, type, amount,
                     stat, counter,
-                    difficulty, quest_id,
+                    difficulty, quest_id, monster_id,
                     time_type, time, time_seconds
                 ) VALUES ${race.rules.map(
                   (_: any, i: number) => `(
@@ -296,6 +296,7 @@ router.post("/races", async function (req, res) {
               point.counter || 0,
               point.difficulty,
               point.quest_id || 0,
+              point.monster_id || 0,
               point.time_type,
               point.time,
               point.time_seconds || 0,

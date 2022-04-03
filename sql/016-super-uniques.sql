@@ -7,3 +7,5 @@ CREATE TABLE super_uniques (
 );
 
 CREATE INDEX super_uniques_character_id ON super_uniques USING btree (character_id);
+
+ALTER TABLE race_rules ADD monster_id integer;

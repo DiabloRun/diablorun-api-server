@@ -183,7 +183,7 @@ export interface RaceRule {
   race_id: number;
   context: "points" | "finish_conditions";
   amount: number;
-  type: "quest" | "per" | "for" | "stat";
+  type: "quest" | "per" | "for" | "stat" | "super_unique";
   counter: number;
   stat: keyof Character;
   difficulty: Character["difficulty"];
