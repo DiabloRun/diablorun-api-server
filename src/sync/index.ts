@@ -188,7 +188,13 @@ export async function sync(payload: Payload) {
     */
 
   // Check command line args to join race
-  if (!before && race && (!race.finish_time || time < race.finish_time)) {
+  if (
+    !before &&
+    race &&
+    race.start_time &&
+    race.start_time <= time &&
+    (!race.finish_time || time < race.finish_time)
+  ) {
     await joinRace(time, characterId, race);
   }
 
