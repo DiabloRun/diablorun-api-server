@@ -10,7 +10,7 @@ export function getSuperUniqueUpdates(
 ) {
   const superUniqueUpdates: Partial<CharacterSuperUnique>[] = [];
   const killedSuperUniques = (payload.KilledMonsters ?? []).filter(
-    (kill) => kill.TypeFlags & 0x00000008
+    (kill) => kill.TypeFlags & 0x00000002
   );
 
   if (!killedSuperUniques.length) {

@@ -67,6 +67,10 @@ export interface Character {
   finished_nightmare_quests: number;
   finished_hell_quests: number;
 
+  normal_super_uniques: number;
+  nightmare_super_uniques: number;
+  hell_super_uniques: number;
+
   // race stats
   race_id: number;
   points: number;

@@ -59,7 +59,7 @@ router.get("/races/:id", async function (req, res) {
   const id = req.params.id;
   const time = Math.floor(Date.now() / 1000);
 
-  const [race, lobby, rules, characters] = await Promise.all([
+  const [race, lobby, rules, characters, notifications] = await Promise.all([
     // Fetch race
     db.query(
       `
@@ -119,6 +119,8 @@ router.get("/races/:id", async function (req, res) {
         `,
       [id]
     ),
+    // Fetch notifications
+    db.query(`SELECT * FROM character_checkpoints WHERE race_id=$1`, [id]),
   ]);
 
   if (!race.rows[0].active) {
@@ -132,7 +134,7 @@ router.get("/races/:id", async function (req, res) {
     rules: rules.rows,
     characters: characters.rows,
     lobby: lobby.rows,
-    // notifications: notifications.rows,
+    notifications: notifications.rows,
     // pointsLog: race.rows[0].start_time ? pointsLog.rows : []
   });
 });

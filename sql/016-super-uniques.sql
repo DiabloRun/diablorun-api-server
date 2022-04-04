@@ -9,3 +9,7 @@ CREATE TABLE super_uniques (
 CREATE INDEX super_uniques_character_id ON super_uniques USING btree (character_id);
 
 ALTER TABLE race_rules ADD monster_id integer;
+
+ALTER TABLE characters ADD normal_super_uniques integer DEFAULT 0;
+ALTER TABLE characters ADD nightmare_super_uniques integer DEFAULT 0;
+ALTER TABLE characters ADD hell_super_uniques integer DEFAULT 0;

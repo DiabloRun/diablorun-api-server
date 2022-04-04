@@ -140,6 +140,7 @@ export async function sync(payload: Payload) {
     time,
     payload,
     questUpdates,
+    superUniqueUpdates,
     before
   );
   const itemUpdates = getItemUpdates(
