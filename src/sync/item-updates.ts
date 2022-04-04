@@ -99,30 +99,36 @@ export function getItemUpdates(
     ...(payload.Hireling?.RemovedItems || []),
   ] as ItemPayload[];
 
-  for (const itemPayload of removedItems) {
-    const container = getItemContainer(itemPayload.Location.Container);
-    const slot = getItemSlot(
-      container,
-      inventoryTab,
-      itemPayload.Location.BodyLocation
-    );
-    const x = itemPayload.Location.X;
-    const y = itemPayload.Location.Y;
+  if (payload.ClearItems) {
+    for (const item of itemsBefore) {
+      removedItemHashes.push(Number(item.item_hash));
+    }
+  } else {
+    for (const itemPayload of removedItems) {
+      const container = getItemContainer(itemPayload.Location.Container);
+      const slot = getItemSlot(
+        container,
+        inventoryTab,
+        itemPayload.Location.BodyLocation
+      );
+      const x = itemPayload.Location.X;
+      const y = itemPayload.Location.Y;
 
-    const itemBefore = itemsBefore.find((item) => {
-      if (item.container !== container) {
-        return false;
+      const itemBefore = itemsBefore.find((item) => {
+        if (item.container !== container) {
+          return false;
+        }
+
+        if (container === "character" || container === "hireling") {
+          return item.slot === slot;
+        }
+
+        return item.x === x && item.y === y;
+      });
+
+      if (itemBefore) {
+        removedItemHashes.push(Number(itemBefore.item_hash));
       }
-
-      if (container === "character" || container === "hireling") {
-        return item.slot === slot;
-      }
-
-      return item.x === x && item.y === y;
-    });
-
-    if (itemBefore) {
-      removedItemHashes.push(Number(itemBefore.item_hash));
     }
   }
 

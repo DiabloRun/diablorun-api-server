@@ -79,6 +79,7 @@ export interface Payload {
   };
 
   InventoryTab?: number;
+  ClearItems?: boolean;
   AddedItems?: ItemPayload[];
   RemovedItems?: ItemPayload[] | number[];
 
