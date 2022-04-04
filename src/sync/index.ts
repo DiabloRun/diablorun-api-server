@@ -230,6 +230,7 @@ export async function sync(payload: Payload) {
     action: "update_character",
     id: characterId,
     name: payload.Name,
+    user: user,
     characterUpdates,
     itemUpdates,
     questUpdates,
