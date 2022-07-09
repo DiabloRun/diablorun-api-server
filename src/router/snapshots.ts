@@ -2,7 +2,14 @@ import { Router } from "express";
 import db from "../services/db";
 import * as sql from "pg-format";
 import { getUserByName } from "../collections/users";
-import { CharacterSnapshot } from "src/types";
+import {
+  CharacterItem,
+  CharacterQuest,
+  CharacterSnapshot,
+  CharacterSuperUnique,
+  Race,
+} from "src/types";
+import { itemImages } from "@diablorun/diablorun-data";
 
 export const router = Router();
 
@@ -27,16 +34,16 @@ async function getCharacterSnapshot(
 
   const character = characters.rows[0];
   const [items, quests, superUniques, races] = await Promise.all([
-    await db.query(
+    await db.query<CharacterItem>(
       `SELECT * FROM character_items WHERE character_id=${character.id}`
     ),
-    await db.query(
+    await db.query<CharacterQuest>(
       `SELECT update_time, difficulty, quest_id FROM quests WHERE character_id=${character.id}`
     ),
-    await db.query(
+    await db.query<CharacterSuperUnique>(
       `SELECT update_time, difficulty, monster_id FROM super_uniques WHERE character_id=${character.id}`
     ),
-    await db.query(`
+    await db.query<Race>(`
       SELECT race_characters.*, races.id, races.name, races.description, races.entry_hc, races.entry_players,
         races.entry_classic, races.entry_ama, races.entry_sor, races.entry_nec, races.entry_pal, races.entry_bar,
         races.entry_dru, races.entry_asn
@@ -48,7 +55,24 @@ async function getCharacterSnapshot(
 
   return {
     character,
-    items: items.rows,
+    items: items.rows.map((item) => {
+      /*
+      let runeword;
+      const runewordMatch = item.name.match(/^(.*?) \[(.*?)\]$/);
+
+      if (runewordMatch) {
+        runeword = runewordMatch[2];
+      }
+      */
+
+      return {
+        ...item,
+        // name: runeword ? item.base_name : item.name,
+        // runeword,
+        // properties: JSON.parse(item.properties),
+        imageUrl: itemImages[item.name] || itemImages[item.base_name],
+      };
+    }),
     quests: quests.rows,
     superUniques: superUniques.rows,
     races: races.rows,
