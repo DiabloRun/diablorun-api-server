@@ -37,7 +37,7 @@
     "typescript": "^4.2.2"
   },
   "dependencies": {
-    "@diablorun/diablorun-data": "github:DiabloRun/diablorun-data#0.1.5",
+    "@diablorun/diablorun-data": "github:DiabloRun/diablorun-data#0.1.10",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
