@@ -109,7 +109,7 @@ router.get('/active-users', async function (req, res) {
   const { rows } = await db.query(`
     WITH active_characters AS (
       SELECT
-          user_id, hero, level, difficulty, area,
+          user_id, hero, level, difficulty, area, gold_stash, gold,
           ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY update_time DESC) as user_index
       FROM characters WHERE update_time > $1
     )
